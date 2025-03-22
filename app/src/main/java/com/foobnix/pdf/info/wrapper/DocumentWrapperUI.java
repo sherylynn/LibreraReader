@@ -1565,7 +1565,8 @@ public class DocumentWrapperUI {
     };
 
     public void doHideShowToolBar() {
-        AppState.get().isShowToolBar = !AppState.get().isShowToolBar;
+        // 修改为始终显示工具栏，不再切换状态
+        AppState.get().isShowToolBar = true;
         initToolBarPlusMinus();
     }
 
@@ -1623,14 +1624,15 @@ public class DocumentWrapperUI {
             //AppState.get().isEditMode = true;
         }
 
+        // 修改逻辑：小窗口始终显示，只有工具栏会隐藏
         if (AppState.get().isEditMode) {
             DocumentController.turnOnButtons(a);
             show();
         } else {
             DocumentController.turnOffButtons(a);
-
-            hide();
-
+            
+            // 修改hide方法的调用，改为只隐藏工具栏，不隐藏小窗口
+            hideToolbarsOnly();
         }
 
 
@@ -1682,6 +1684,18 @@ public class DocumentWrapperUI {
         // speedSeekBar.setVisibility(View.GONE);
 
     }
+    
+    // 新增方法：只隐藏工具栏，不隐藏小窗口
+    public void hideToolbarsOnly() {
+        // 保持menuLayout可见
+        menuLayout.setVisibility(View.VISIBLE);
+        
+        // 隐藏上下工具栏
+        bottomBar.setVisibility(View.GONE);
+        adFrame.setVisibility(View.GONE);
+        adFrame.setClickable(false);
+        imageMenuArrow.setImageResource(android.R.drawable.arrow_down_float);
+    }
 
     public void _hideSeekBarInReadMode() {
         if (!AppState.get().isEditMode) {
@@ -1698,6 +1712,7 @@ public class DocumentWrapperUI {
     };
 
     public void show() {
+        // 确保小窗口始终可见
         menuLayout.setVisibility(View.VISIBLE);
 
         titleBar.setVisibility(View.VISIBLE);

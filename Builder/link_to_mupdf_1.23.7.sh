@@ -114,7 +114,7 @@ if [ "$(uname)" == "Darwin" ]; then
 fi
 
 PATH1=/Volumes/SSD-USB/Android/Sdk/ndk
-PATH2=/home/dev/Android/Sdk/ndk
+PATH2=/home/lynn/tools/Android/Sdk/ndk
 
 if [ "$1" == "clean_ndk" ]; then
   if [ "$2" == "fdroid" ]; then
