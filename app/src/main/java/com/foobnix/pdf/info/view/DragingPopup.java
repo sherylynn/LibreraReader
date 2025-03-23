@@ -228,6 +228,11 @@ public abstract class DragingPopup {
                 }
             }
             anchor.setTag(tag);
+            // Set tag on root view to ensure AdvGestureDetector can detect it
+            View rootView = popupView.getRootView();
+            if (rootView != null) {
+                rootView.setTag(tag);
+            }
         }
 
         popupContent.removeAllViews();
