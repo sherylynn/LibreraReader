@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Rect;
 import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.MotionEvent;
+import android.view.View;
 import android.widget.Toast;
 
 import com.foobnix.android.utils.Dips;
@@ -165,7 +166,29 @@ public class AdvGuestureDetector extends SimpleOnGestureListener implements IMul
     @Override
     public boolean onSingleTapUp(final MotionEvent e) {
         updateBorders();
-        if (AppState.get().editWith != AppState.EDIT_DELETE && docCtrl.closeDialogs()) {
+        // 检查当前显示的对话框是否是书签窗口
+        boolean isBookmarksDialogVisible = false;
+        if (docCtrl.isVisibleDialog()) {
+            View closePopupView = docCtrl.getActivity().findViewById(R.id.closePopup);
+            if (closePopupView != null) {
+                // 获取closePopup按钮的父视图
+                View parent = closePopupView.getParent() instanceof View ? (View) closePopupView.getParent() : null;
+                // 检查父视图或其父视图是否有书签相关标签
+                while (parent != null) {
+                    if (parent.getTag() != null) {
+                        String tag = parent.getTag().toString();
+                        if (tag.contains("bookmarks") || tag.contains("addBookmarks")) {
+                            isBookmarksDialogVisible = true;
+                            break;
+                        }
+                    }
+                    parent = parent.getParent() instanceof View ? (View) parent.getParent() : null;
+                }
+            }
+        }
+        
+        // 如果是书签窗口，不关闭对话框；否则正常关闭对话框
+        if (!isBookmarksDialogVisible && AppState.get().editWith != AppState.EDIT_DELETE && docCtrl.closeDialogs()) {
             alowConfirm = false;
             return true;
         }
