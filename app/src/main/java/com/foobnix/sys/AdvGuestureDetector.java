@@ -167,18 +167,24 @@ public class AdvGuestureDetector extends SimpleOnGestureListener implements IMul
     public boolean onSingleTapUp(final MotionEvent e) {
         updateBorders();
         // 检查当前显示的对话框是否是书签窗口
-        boolean isBookmarksDialogVisible = false;
+        boolean isSpecialDialogVisible = false;
         if (docCtrl.isVisibleDialog()) {
             View closePopupView = docCtrl.getActivity().findViewById(R.id.closePopup);
             if (closePopupView != null) {
                 // 获取closePopup按钮的父视图
                 View parent = closePopupView.getParent() instanceof View ? (View) closePopupView.getParent() : null;
-                // 检查父视图或其父视图是否有书签相关标签
+                // 检查父视图或其父视图是否有特殊标签
                 while (parent != null) {
                     if (parent.getTag() != null) {
                         String tag = parent.getTag().toString();
-                        if (tag.contains("bookmarks") || tag.contains("addBookmarks")) {
-                            isBookmarksDialogVisible = true;
+                        // 检查是否是书签、目录、书库、对比度亮度、设置或注释窗口
+                        if (tag.contains("bookmarks") || tag.contains("addBookmarks") || 
+                            tag.contains("content_of_book") || // 目录窗口
+                            tag.contains("library") || // 书库窗口
+                            tag.contains("contrastAndBrigtness") || // 对比度亮度窗口
+                            tag.contains("preferences") || tag.contains("PREF") || // 设置窗口
+                            tag.contains("annotations")) { // 注释窗口
+                            isSpecialDialogVisible = true;
                             break;
                         }
                     }
@@ -187,8 +193,8 @@ public class AdvGuestureDetector extends SimpleOnGestureListener implements IMul
             }
         }
         
-        // 如果是书签窗口，不关闭对话框；否则正常关闭对话框
-        if (!isBookmarksDialogVisible && AppState.get().editWith != AppState.EDIT_DELETE && docCtrl.closeDialogs()) {
+        // 如果是特殊窗口，不关闭对话框；否则正常关闭对话框
+        if (!isSpecialDialogVisible && AppState.get().editWith != AppState.EDIT_DELETE && docCtrl.closeDialogs()) {
             alowConfirm = false;
             return true;
         }
